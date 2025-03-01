@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChalkeeDesktop", "ChalkeeDesktop\ChalkeeDesktop.csproj", "{D5DB11FE-42C7-4BCD-9FBD-BBE48D2C5454}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChalkeeDesktopLib", "ChalkeeDesktopLib\ChalkeeDesktopLib.csproj", "{EC10301C-36FA-42A1-8248-D929E3F23AE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChalkeeDesktopTest", "ChalkeeDesktopTest\ChalkeeDesktopTest.csproj", "{5BE456D8-BA3A-43B3-AC7B-8701EDFA9979}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5DB11FE-42C7-4BCD-9FBD-BBE48D2C5454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5DB11FE-42C7-4BCD-9FBD-BBE48D2C5454}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5DB11FE-42C7-4BCD-9FBD-BBE48D2C5454}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5DB11FE-42C7-4BCD-9FBD-BBE48D2C5454}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC10301C-36FA-42A1-8248-D929E3F23AE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC10301C-36FA-42A1-8248-D929E3F23AE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC10301C-36FA-42A1-8248-D929E3F23AE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC10301C-36FA-42A1-8248-D929E3F23AE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE456D8-BA3A-43B3-AC7B-8701EDFA9979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE456D8-BA3A-43B3-AC7B-8701EDFA9979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE456D8-BA3A-43B3-AC7B-8701EDFA9979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE456D8-BA3A-43B3-AC7B-8701EDFA9979}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
