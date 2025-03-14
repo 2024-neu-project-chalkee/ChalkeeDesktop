@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
+
 namespace ChalkeeDesktopLib;
 public class AppUI(AuthService authService)
 {
@@ -147,4 +150,27 @@ public class AppUI(AuthService authService)
         Console.WriteLine();
         return pass;
     }
+
+    private void MyTimeTables()
+    {
+        Console.Clear();
+        
+        
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
+
+        var connectionString = configuration.GetConnectionString("ChalkeeDB");
+        await using var dataSource = NpgsqlDataSource.Create(connectionString!);
+
+        await using var command = dataSource.CreateCommand("SELECT some_field FROM some_table");
+        await using var reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            Console.WriteLine(reader.GetString(0));
+        }
+    }
+
+
+
 }
