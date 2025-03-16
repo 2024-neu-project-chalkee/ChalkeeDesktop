@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="Isopoh.Cryptography.Argon2" Version="2.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.1.25080.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.1.25080.5" />
       <PackageReference Include="Npgsql" Version="9.0.3" />
     </ItemGroup>
 

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+
 using Npgsql;
 
 namespace ChalkeeDesktopLib;
@@ -11,12 +12,12 @@ public class AppUI(AuthService authService)
     public async Task Run()
     {
         if (!await SignInMenu()) return;
-        ShowDashboard();
+        await ShowDashboard();
     }
 
     private async Task<bool> SignInMenu()
     {
-        bool signInSuccess = true;
+        var signInSuccess = true;
         Console.CursorVisible = true;
         while (true)
         {
@@ -31,7 +32,7 @@ public class AppUI(AuthService authService)
 
             User = await authService.TrySignIn(emailOrSid, pass);
             
-            if (User != null)
+            if (User != null && User.Role == "Student")
             {
                 return true;
             }
@@ -42,25 +43,10 @@ public class AppUI(AuthService authService)
         }
     }
 
-    private void ShowDashboard()
+    private async Task ShowDashboard()
     {
-        string[] options = [];
-        switch (User!.Role)
-        {
-            case "Student":
-            options = ["My information", "My timetables", "My grades", "Sign out"];
-            break;
-            case "Teacher":
-                options = ["My information", "My timetables", "Sign out"];
-            break;
-            case "Principal":
-                options = ["My information", "My timetables", "Manage timetables", "Sign out"];
-            break;
-            case "Admin":
-                options = ["Sign out"];
-            break;
-        }
-        int selectedIndex = 0;
+        string[] options = ["Test", "My information", "My timetables", "My grades", "Sign out"];
+        var selectedIndex = 0;
         Console.CursorVisible = false;
         
         while (true)
@@ -68,7 +54,7 @@ public class AppUI(AuthService authService)
             Console.Clear();
             Console.WriteLine($"Welcome back, {User!.FirstName}!\nUse the up and down arrows to navigate, ENTER to select.\n");
 
-            for (int i = 0; i < options.Length; i++)
+            for (var i = 0; i < options.Length; i++)
             {
                 if (i == selectedIndex)
                 {
@@ -92,17 +78,22 @@ public class AppUI(AuthService authService)
                     selectedIndex = (selectedIndex == options.Length - 1) ? 0 : selectedIndex + 1;
                     break;
                 case ConsoleKey.Enter:
-                    HandleMenuSelection(options[selectedIndex]);
+                    await HandleMenuSelection(options[selectedIndex]);
+                    return;
+                default:
                     return;
             }
         }
     }
 
-    private void HandleMenuSelection(string selection)
+    private async Task HandleMenuSelection(string selection)
     {
         Console.Clear();
         switch (selection)
         {
+            case "Test":
+                await LoadTimetables();
+                break;
             case "My information":
                 Console.WriteLine("Your information should be displayed here soon!");
                 break;
@@ -112,9 +103,6 @@ public class AppUI(AuthService authService)
             case "My timetables":
                 Console.WriteLine("Your timetables should be displayed here soon!");
                 break;
-            case "Manage timetables":
-                Console.WriteLine("Timetable management should be displayed here soon!");
-                break;
             case "Sign out":
                 Console.WriteLine("Signing out...");
                 Task.Delay(1000).Wait();
@@ -123,12 +111,12 @@ public class AppUI(AuthService authService)
         }
         Console.WriteLine("\nPress any key to return...");
         Console.ReadKey();
-        ShowDashboard();
+        await ShowDashboard();
     }
 
     private static string ReadPassword()
     {
-        string pass = string.Empty;
+        var pass = string.Empty;
         ConsoleKey key;
         do
         {
@@ -151,26 +139,28 @@ public class AppUI(AuthService authService)
         return pass;
     }
 
-    private void MyTimeTables()
+    private static async Task LoadTimetables()
     {
-        Console.Clear();
-        
-        
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
-
-        var connectionString = configuration.GetConnectionString("ChalkeeDB");
-        await using var dataSource = NpgsqlDataSource.Create(connectionString!);
-
-        await using var command = dataSource.CreateCommand("SELECT some_field FROM some_table");
-        await using var reader = await command.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
+        try
         {
-            Console.WriteLine(reader.GetString(0));
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json").Build();
+
+            var connectionString = configuration.GetConnectionString("ChalkeeDB");
+            await using var dataSource = NpgsqlDataSource.Create(connectionString!);
+
+            await using var command = dataSource.CreateCommand("SELECT name FROM subjects");
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                Console.WriteLine(reader.GetString(0));
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Oops, an unexpected error occured!");
         }
     }
-
-
-
+    
 }
