@@ -8,7 +8,7 @@ using Npgsql;
 namespace ChalkeeDesktopLib;
 public class AppUI(AuthService authService)
 {
-    private User? User { get; set; } = null;
+    public static User? CurrentUser { get; set; } = null;
     public async Task Run()
     {
         if (!await SignInMenu()) return;
@@ -30,9 +30,9 @@ public class AppUI(AuthService authService)
             Console.Write("Password: ");
             var pass = ReadPassword();
 
-            User = await authService.TrySignIn(emailOrSid, pass);
+            CurrentUser = await authService.TrySignIn(emailOrSid, pass);
             
-            if (User != null && User.Role == "Student")
+            if (CurrentUser != null && CurrentUser!.Role == "Student")
             {
                 return true;
             }
@@ -52,7 +52,7 @@ public class AppUI(AuthService authService)
         while (true)
         {
             Console.Clear();
-            Console.WriteLine($"Welcome back, {User!.FirstName}!\nUse the up and down arrows to navigate, ENTER to select.\n");
+            Console.WriteLine($"Welcome back, {CurrentUser!.FirstName}!\nUse the up and down arrows to navigate, ENTER to select.\n");
 
             for (var i = 0; i < options.Length; i++)
             {
@@ -95,7 +95,8 @@ public class AppUI(AuthService authService)
                 await LoadTimetables();
                 break;
             case "My information":
-                Console.WriteLine("Your information should be displayed here soon!");
+                //Console.WriteLine("Your information should be displayed here soon!");
+                await LoadMyInformation();
                 break;
             case "My grades":
                 Console.WriteLine("Your grades should be displayed here soon!");
@@ -139,6 +140,7 @@ public class AppUI(AuthService authService)
         return pass;
     }
 
+
     private static async Task LoadTimetables()
     {
         try
@@ -149,8 +151,14 @@ public class AppUI(AuthService authService)
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
 
+
             await using var command = dataSource.CreateCommand("SELECT name FROM subjects");
             await using var reader = await command.ExecuteReaderAsync();
+
+
+
+
+
 
             while (await reader.ReadAsync())
             {
@@ -162,5 +170,41 @@ public class AppUI(AuthService authService)
             Console.WriteLine("Oops, an unexpected error occured!");
         }
     }
+
+    private static async Task LoadMyInformation()
+    {
+        try
+        {
+
+            
+
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json").Build();
+
+            var connectionString = configuration.GetConnectionString("ChalkeeDB");
+            await using var dataSource = NpgsqlDataSource.Create(connectionString!);
+
+            await using var command = dataSource.CreateCommand("SELECT institutions.name, institutions.location, institutions.website, institutions.phone_number FROM users JOIN institutions ON users.institution_id = institutions.id WHERE users.id = @user_id");
+            command.Parameters.AddWithValue("user_id", CurrentUser!.ID);
+            await using var reader = await command.ExecuteReaderAsync();
+
+
+
+
+
+
+            while (await reader.ReadAsync())
+            {
+                Console.WriteLine(reader.GetString(0));
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Oops, an unexpected error occured!");
+            Console.WriteLine(e.Message);
+            
+        }
+    }
+    
     
 }
