@@ -146,7 +146,7 @@ public class AppUI(AuthService authService)
         try
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
@@ -179,32 +179,50 @@ public class AppUI(AuthService authService)
             
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
 
             await using var command = dataSource.CreateCommand("SELECT institutions.name, institutions.location, institutions.website, institutions.phone_number FROM users JOIN institutions ON users.institution_id = institutions.id WHERE users.id = @user_id");
             command.Parameters.AddWithValue("user_id", CurrentUser!.ID);
-            await using var reader = await command.ExecuteReaderAsync();
+            await using var InstitutionReader = await command.ExecuteReaderAsync();
+
+            await using var command2 = dataSource.CreateCommand("SELECT groups.name, groups.grouproom FROM user_groups JOIN groups ON user_groups.group_id = groups.id WHERE user_id = @user_id");
+            command2.Parameters.AddWithValue("user_id", CurrentUser!.ID);
+            await using var GroupReader = await command2.ExecuteReaderAsync();
+
+            await using var command3 = dataSource.CreateCommand("SELECT classes.number, classes.letter FROM users JOIN classes ON users.class_id = classes.id WHERE users.id = @user_id");
+            command3.Parameters.AddWithValue("user_id", CurrentUser!.ID);
+            await using var ClassReader = await command3.ExecuteReaderAsync();
 
 
-
-
-
-
-            while (await reader.ReadAsync())
+            Console.WriteLine($"Name: {CurrentUser.FirstName + " " + CurrentUser.LastName}");
+            Console.WriteLine($"Email address: {CurrentUser.Email}");
+            Console.WriteLine($"Your student ID: {CurrentUser.StudentId}");
+            while (await InstitutionReader.ReadAsync())
             {
-                Console.WriteLine($"Name: {CurrentUser.FirstName + " " + CurrentUser.LastName}");
-                Console.WriteLine($"Email address: {reader.GetString(2)}");
-                Console.WriteLine($"Your student ID: {CurrentUser.StudentId}");
-                Console.WriteLine($"Class: {CurrentUser.ClassId}");
-                Console.WriteLine($"Your institution: {reader.GetString(0)}");
-                Console.WriteLine($"Street: {reader.GetString(1)}");
-                Console.WriteLine($"Tel. Number: {reader.GetString(3)}");
+                Console.WriteLine($"Your institution: {InstitutionReader["name"]}");
+                Console.WriteLine($"location: {InstitutionReader["location"]}");
+                Console.WriteLine($"Tel. Number: {InstitutionReader["phone_number"]}");
                 
 
             }
+
+
+            while (await GroupReader.ReadAsync())
+            {
+                Console.WriteLine($"Group: {GroupReader["name"]}");
+
+            }
+
+            while (await ClassReader.ReadAsync())
+            {
+                Console.WriteLine($"Class: {ClassReader["number"] + "." + ClassReader["letter"]}");
+                
+            }
+
+
         }
         catch (Exception e)
         {
