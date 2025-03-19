@@ -146,7 +146,7 @@ public class AppUI(AuthService authService)
         try
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
+                .AddJsonFile("appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
@@ -179,7 +179,7 @@ public class AppUI(AuthService authService)
             
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
+                .AddJsonFile("appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
