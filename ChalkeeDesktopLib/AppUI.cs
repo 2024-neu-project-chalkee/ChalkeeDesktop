@@ -146,7 +146,7 @@ public class AppUI(AuthService authService)
         try
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
@@ -179,7 +179,7 @@ public class AppUI(AuthService authService)
             
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
@@ -195,7 +195,15 @@ public class AppUI(AuthService authService)
 
             while (await reader.ReadAsync())
             {
-                Console.WriteLine(reader.GetString(0));
+                Console.WriteLine($"Name: {CurrentUser.FirstName + " " + CurrentUser.LastName}");
+                Console.WriteLine($"Email address: {reader.GetString(2)}");
+                Console.WriteLine($"Your student ID: {CurrentUser.StudentId}");
+                Console.WriteLine($"Class: {CurrentUser.ClassId}");
+                Console.WriteLine($"Your institution: {reader.GetString(0)}");
+                Console.WriteLine($"Street: {reader.GetString(1)}");
+                Console.WriteLine($"Tel. Number: {reader.GetString(3)}");
+                
+
             }
         }
         catch (Exception e)
