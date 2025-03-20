@@ -263,20 +263,32 @@ public class AppUI(AuthService authService)
                         timetableReader["subject"].ToString()!,
                         timetableReader["name"].ToString()!,
                         timetableReader["room"].ToString()!,
-                        timetableReader["class"].ToString()!,
-                        timetableReader["group"].ToString()!,
-                        timetableReader["classroom"].ToString()!,
-                        timetableReader["grouproom"].ToString()!,
-                        timetableReader["status"].ToString()!
+                        timetableReader["class"].GetType() == typeof(System.DBNull)! ? null : (string)timetableReader["class"],
+                        timetableReader["group"].GetType() == typeof(System.DBNull)! ? null : (string)timetableReader["group"],
+                        timetableReader["classroom"].GetType() == typeof(System.DBNull)! ? null : (string)timetableReader["classroom"],
+                        timetableReader["grouproom"].GetType() == typeof(System.DBNull)! ? null : (string)timetableReader["grouproom"],
+                        timetableReader["status"].GetType() == typeof(System.DBNull)! ? null : (string)timetableReader["status"]
                     )
                 );
             }
 
             dailySchedules = [..dailySchedules.OrderBy(x => x.Day).ThenBy(x => x.Period)];
 
-            foreach (var day in dailySchedules)
+            string[] days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            
+            var groupedSchedules = dailySchedules.GroupBy(x => x.Day);
+
+            foreach (var group in groupedSchedules)
             {
-                Console.WriteLine(day.ToString());
+	            var dayIndex = group.Key - 1;
+
+	            if (dayIndex < 0 || dayIndex >= days.Length) continue;
+	            Console.WriteLine($"{days[dayIndex]}:");
+
+	            foreach (var schedule in group)
+	            {
+		            Console.WriteLine(schedule.ToString());
+	            }
             }
         }
         catch (Exception e)

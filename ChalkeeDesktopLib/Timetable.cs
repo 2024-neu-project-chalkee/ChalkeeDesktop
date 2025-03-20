@@ -12,11 +12,11 @@ namespace ChalkeeDesktopLib
         string subject,
         string name,
         string room,
-        string @class,
-        string group,
-        string classroom,
-        string grouproom,
-        string status)
+        string? @class,
+        string? group,
+        string? classroom,
+        string? grouproom,
+        string? status)
     {
 
         public int Day { get; init; } = day;
@@ -32,16 +32,13 @@ namespace ChalkeeDesktopLib
 
         public override string ToString()
         {
-            return $"{new[] {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}[Day]}:\n" +
-                $"\tPeriod: {Period}\n" +
+            return $"\tPeriod: {Period}\n" +
                 $"\tSubject: {Subject}\n" +
                 $"\tName of teacher: {Name}\n" +
                 $"\tRoom: {Room}\n" +
-                $"\tClass: {Class}\n" +
-                $"\tGroup: {Group}\n" +
-                $"\tClass room: {Classroom}\n" +
-                $"\tGroup room: {Grouproom}\n" +
-                $"\tStatus: {Status}\n";
+                $"\t{(Class != null ? $"Class: {Class}" : $"Group: {Group}")}\n" +
+                $"\t{(Classroom != null ? $"Class room: {Classroom}" : $"Group room: {Grouproom}")}\n" +
+                $"{(Status != null ? $"\tStatus: {Status}\n" : "")}";
         }
 
     }
