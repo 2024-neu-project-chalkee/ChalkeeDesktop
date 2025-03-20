@@ -91,9 +91,9 @@ public class AppUI(AuthService authService)
         Console.Clear();
         switch (selection)
         {
-            case "Test":
-                await LoadTimetables();
-                break;
+           // case "Test":
+             //   
+               // break;
             case "My information":
                 //Console.WriteLine("Your information should be displayed here soon!");
                 await LoadMyInformation();
@@ -102,7 +102,8 @@ public class AppUI(AuthService authService)
                 Console.WriteLine("Your grades should be displayed here soon!");
                 break;
             case "My timetables":
-                Console.WriteLine("Your timetables should be displayed here soon!");
+                //Console.WriteLine("Your timetables should be displayed here soon!");
+                await LoadTimetables();
                 break;
             case "Sign out":
                 Console.WriteLine("Signing out...");
@@ -216,6 +217,46 @@ public class AppUI(AuthService authService)
             Console.WriteLine(e.Message);
         }
     }
+
+    private static async Task LoadMyGrades()
+    {
+        try
+        {
+
+
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
+
+            var connectionString = configuration.GetConnectionString("ChalkeeDB");
+            await using var dataSource = NpgsqlDataSource.Create(connectionString!);
+
+
+            string queryString = "SELECT grades.id, grades.announcement_id, grades.grade, grades.weight, announcements.type, announcements.content, announcements.date, CONCAT(users.first_name, ' ', users.last_name) AS name, subjects.name AS subject_name, groups.name AS group_name, CASE   WHEN classes.number IS NULL AND classes.letter IS NULL THEN NULL  ELSE CONCAT(classes.number, '.', classes.letter)  END AS class_name FROM grades JOIN announcements ON announcements.id = grades.announcement_id JOIN users ON users.id = grades.teacher_id JOIN subjects ON subjects.id = grades.subject_id LEFT JOIN groups ON groups.id = announcements.group_id LEFT JOIN classes ON classes.id = announcements.class_id WHERE grades.student_id = $1 ORDER BY announcements.date `, @user_id";
+
+            await using var command = dataSource.CreateCommand(queryString);
+            command.Parameters.AddWithValue("user_id", CurrentUser!.ID);
+            await using var TimetableReader = await command.ExecuteReaderAsync();
+
+
+
+
+
+
+
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Oops, an unexpected error occured!");
+            Console.WriteLine(e.Message);
+        }
+
+
+
+    }
+
+
+
 
     private static async Task LoadMyInformation()
     {
