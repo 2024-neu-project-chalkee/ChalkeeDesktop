@@ -8,6 +8,8 @@ using Npgsql;
 namespace ChalkeeDesktopLib;
 public class AppUI(AuthService authService)
 {
+
+	public static List<string> _results_for_testing = []; // for excpetion messages
     private static User? CurrentUser { get; set; } = null;
     public async Task Run()
     {
@@ -102,7 +104,7 @@ public class AppUI(AuthService authService)
                 break;
             case "My timetables":
                 //Console.WriteLine("Your timetables should be displayed here soon!");
-                await LoadTimetables();
+                await LoadMyTimetables();
                 break;
             case "Sign out":
                 Console.WriteLine("Signing out...");
@@ -148,7 +150,7 @@ public class AppUI(AuthService authService)
 
             List<Timetable> dailySchedules= [];
             
-            var configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
@@ -309,20 +311,54 @@ public class AppUI(AuthService authService)
 
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("C:\\Users\\Móric2\\OneDrive\\Dokumentumok\\Neu12b\\ikt\\Aminisztrációs projekt (NYÁRON CSINÁLNI)\\ChalkeeConsole\\ChalkeeDesktop\\appsettings.json").Build();
+                .AddJsonFile("appsettings.json").SetBasePath(Directory.GetCurrentDirectory()).Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
 
 
-            string queryString = "SELECT grades.id, grades.announcement_id, grades.grade, grades.weight, announcements.type, announcements.content, announcements.date, CONCAT(users.first_name, ' ', users.last_name) AS name, subjects.name AS subject_name, groups.name AS group_name, CASE   WHEN classes.number IS NULL AND classes.letter IS NULL THEN NULL  ELSE CONCAT(classes.number, '.', classes.letter)  END AS class_name FROM grades JOIN announcements ON announcements.id = grades.announcement_id JOIN users ON users.id = grades.teacher_id JOIN subjects ON subjects.id = grades.subject_id LEFT JOIN groups ON groups.id = announcements.group_id LEFT JOIN classes ON classes.id = announcements.class_id WHERE grades.student_id = $1 ORDER BY announcements.date `, @user_id";
+            string queryString = """
+                SELECT
+
+                grades.id,
+                grades.announcement_id,
+                grades.grade,
+                grades.weight,
+                announcements.type,
+                announcements.content,
+                announcements.date,
+                CONCAT(users.first_name, ' ', users.last_name) AS name,
+                subjects.name AS subject_name,
+                groups.name AS group_name,
+                CASE 
+                	WHEN classes.number IS NULL AND classes.letter IS NULL THEN NULL
+                	ELSE CONCAT(classes.number, '.', classes.letter) 
+                END AS class_name
+
+                FROM grades
+
+                JOIN announcements ON announcements.id = grades.announcement_id
+                JOIN users ON users.id = grades.teacher_id
+                JOIN subjects ON subjects.id = grades.subject_id
+                LEFT JOIN groups ON groups.id = announcements.group_id
+                LEFT JOIN classes ON classes.id = announcements.class_id
+
+                WHERE grades.student_id = @user_id ORDER BY announcements.date
+                `
+
+                """;
+
+            //string queryString = "SELECT grades.id, grades.announcement_id, grades.grade, grades.weight, announcements.type, announcements.content, announcements.date, CONCAT(users.first_name, ' ', users.last_name) AS name, subjects.name AS subject_name, groups.name AS group_name, CASE   WHEN classes.number IS NULL AND classes.letter IS NULL THEN NULL  ELSE CONCAT(classes.number, '.', classes.letter)  END AS class_name FROM grades JOIN announcements ON announcements.id = grades.announcement_id JOIN users ON users.id = grades.teacher_id JOIN subjects ON subjects.id = grades.subject_id LEFT JOIN groups ON groups.id = announcements.group_id LEFT JOIN classes ON classes.id = announcements.class_id WHERE grades.student_id = $1 ORDER BY announcements.date `, @user_id";
 
             await using var command = dataSource.CreateCommand(queryString);
             command.Parameters.AddWithValue("user_id", CurrentUser!.ID);
-            await using var TimetableReader = await command.ExecuteReaderAsync();
+            await using var GradeReader = await command.ExecuteReaderAsync();
 
 
-
+            while (await GradeReader.ReadAsync())
+            {
+	            
+            }
 
 
 
@@ -342,11 +378,11 @@ public class AppUI(AuthService authService)
 
 
 
-    private static async Task LoadMyInformation()
+    public static async Task LoadMyInformation()
     {
         try
         {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").SetBasePath(Directory.GetCurrentDirectory()).Build();
 
             var connectionString = configuration.GetConnectionString("ChalkeeDB");
             await using var dataSource = NpgsqlDataSource.Create(connectionString!);
@@ -382,8 +418,11 @@ public class AppUI(AuthService authService)
         }
         catch (Exception e)
         {
-            Console.WriteLine("Oops, an unexpected error occured!");
-            Console.WriteLine(e.Message);
+	        
+	        
+	        _results_for_testing.Add(e.Message);
+            //Console.WriteLine("Oops, an unexpected error occured!");
+            //Console.WriteLine(e.Message);
         }
     }
 }
