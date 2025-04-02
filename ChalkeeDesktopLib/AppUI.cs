@@ -308,7 +308,7 @@ public class AppUI(AuthService authService)
     {
         try
         {
-
+            List<Grade> allGradesOfUser = [];
 
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json").SetBasePath(Directory.GetCurrentDirectory()).Build();
@@ -357,7 +357,28 @@ public class AppUI(AuthService authService)
 
             while (await GradeReader.ReadAsync())
             {
-	            
+
+                allGradesOfUser.Add(
+                    new Grade(
+                       
+                        int.Parse(GradeReader["grade"].ToString()!),
+                        int.Parse(GradeReader["weight"].ToString()!),
+                        GradeReader["type"].ToString()!,
+                        GradeReader["content"].ToString()!,
+                        DateOnly.Parse(GradeReader["type"].ToString()!),
+                        GradeReader["name"].ToString()!,
+                        GradeReader["subject_name"].ToString()!,
+                        GradeReader["group_name"].ToString()!,
+                        GradeReader["class_name"].ToString()!
+
+
+
+
+
+                        )
+
+                        );
+
             }
 
 
